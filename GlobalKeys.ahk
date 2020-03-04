@@ -78,4 +78,6 @@ arr:=StrSplit(data, "<n>")
 mi:=arr.Length() 
 Random,rand, 0 , mi
 send % Trim(arr[rand]," `t`r`n")
-Return
+Return 
+
+
