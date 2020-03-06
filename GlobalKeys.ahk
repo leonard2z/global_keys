@@ -1,6 +1,4 @@
-﻿
-;快速输入模式
-global firstCtrl:=False
+﻿global firstCtrl:=False
 global qMode:=False
 global qharr:=0
 
@@ -101,26 +99,67 @@ p::
 return
 
 #if qMode
-    ;҉文҉字҉变҉花҉
+    ;҉文҉字҉变҉花҉ aadd
 h::
-    
-    v:=Clipboard
-    send ^c
-    h:=Clipboard
-    Clipboard:=v
-
+    h:=get_selected_text()
     arr:=StrSplit(h,"")
- 
+    
     res:=""
-
+    
     For k,v In arr
     {
         res=%res%҉%v%
     }
     res=%res%҉
-
+    
     send %res%
 return
 
+#if qMode
+r::
+;朗读选中文字
+    vi:=ComObjCreate("SAPI.SpVoice")
+    v:=vi.GetVoices().Item(0) ;0:zh 1:en 2:ja 3:unkonwn
+    vi.Voice:=v
+    vi.Speak(get_selected_text())
+    return
 
+s::
+; 将选中文件转化为录音后保存到本地
+    ; 1: File Must Exist
+    ; 2: Path Must Exist
+    ; 8: Prompt to Create New File
+    ; 16: Prompt to Overwrite File
+    
+    SAFT48kHz16BitStereo:= 39
+    SSFMCreateForWrite := 3 ;' Creates file even if file exists and so destroys or overwrites the existing file
 
+    text:=get_selected_text()
+
+    oFileStream := ComObjCreate("SAPI.SpFileStream")
+    oFileStream.Format.Type := SAFT48kHz16BitStereo
+    FileSelectFile, path,,%A_DesktopCommon%\record.wav,,*.wav
+    try{
+        oFileStream.Open(path, SSFMCreateForWrite)
+        }
+    Catch, e{
+        MsgBox,未打开文件
+    }
+    
+    vi:=ComObjCreate("SAPI.SpVoice")
+    v:=vi.GetVoices().Item(0) ;0:zh 1:en 2:ja 3:unkonwn
+    vi.Voice:=v
+    vi.AudioOutputStream := oFileStream
+    vi.Speak(text)
+    oFileStream.Close()
+    ; ComObjCreate("System.Speech.Synthesis.SpeechSynthesizer").Speak(get_selected_text())
+return
+
+; 获得选中的文本
+get_selected_text(){
+    v:=Clipboard
+    send ^c
+    h:=Clipboard
+    Clipboard:=v
+return h
+}
