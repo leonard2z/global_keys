@@ -1,7 +1,6 @@
 ﻿#Include, lib/common.ahk
 #Include, lib/explorer.ahk
 #Include, lib/task_scheduler.ahk
-#Include, test.ahk
 
 global firstCtrl:=False
 global qMode:=False
