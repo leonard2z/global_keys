@@ -133,9 +133,9 @@ s::
     v:=vi.GetVoices().Item(0) ;0:zh 1:en 2:ja 3:unkonwn
     vi.Voice:=v
     
-    files:=select_files_to_save("MS24",A_DesktopCommon "\record.wav","","*.wav")  
+    files:=select_files_to_save("MS24",A_Desktop "\record.wav","","*.wav")  
     for k,file in files{
-    ; FileSelectFile, path,S24,%A_DesktopCommon%\record.wav,,*.wav
+    ; FileSelectFile, path,S24,%A_Desktop%\record.wav,,*.wav
     try{
         oFileStream := ComObjCreate("SAPI.SpFileStream")
         oFileStream.Format.Type := SAFT48kHz16BitStereo
@@ -158,7 +158,7 @@ $c::
     create_task:
     run_as_admin_quit("create_task")
     ;创建定时计划,时间由文件名决定
-    ; FileSelectFile, pathes,MS24,%A_DesktopCommon%\,,
+    ; FileSelectFile, pathes,MS24,%A_Desktop%\,,
 
     sel:=StrSplit(Explorer_GetSelected(),["`r`n","`n","`n`r"])
     ; MsgBox, %sel%
