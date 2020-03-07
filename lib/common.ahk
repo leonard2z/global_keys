@@ -58,17 +58,17 @@ run_as_admin_quit(params=""){
 select_files_to_save(   Options, RootDir, Prompt, Filter*){
     
     FileSelectFile OutputVar, %Options%, %RootDir%, %Prompt%, %Filter%
-    MsgBox % OutputVar
+    ;MsgBox % OutputVar
     OutputArray:=StrSplit(OutputVar,["`r`n","`n","`n`r"])
 
     len:=OutputArray.Length()
-    MsgBox, %len%
+    ;MsgBox, %len%
     pathes:=[]
     if(len>0)
     {
         if("M" in Options)
         {
-            MsgBox, "M" in Options
+            ;MsgBox, "M" in Options
             ;有多选
             dir:=OutputArray[1]
 
@@ -77,7 +77,7 @@ select_files_to_save(   Options, RootDir, Prompt, Filter*){
                 Continue
                 path:=dir "\" v
                 pathes.Push(path)
-                MsgBox,%path%
+                ;MsgBox,%path%
             }
         }
     }

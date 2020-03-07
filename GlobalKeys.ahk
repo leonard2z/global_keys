@@ -85,7 +85,7 @@ p::
         Sleep,15000
         send {Media_Next,5}
     }Catch e{
-        MsgBox % e.what e.message e.extra e.file e.line
+        ;MsgBox % e.what e.message e.extra e.file e.line
     }
 return
 
@@ -169,7 +169,7 @@ $c::
         time:=StrReplace(OutNameNoExt, " " ,":")
         create_daily_clock_task(time,path)
     }
-    MsgBox, %info%
+    ;MsgBox, %info%
     info:=""
     return
     
