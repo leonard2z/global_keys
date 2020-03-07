@@ -10,7 +10,9 @@ p:放首音乐</br></br>
 h:文字变花</br></br>
 r:朗读选中文字</br></br>
 s:选中文字朗读文件保存到本地</br></br>
-c:将选中的文件按文件名添加到计划中</br></br>
+c:将选中的文件按文件名添加到计划中</br></br></br></br>
 <b>下载和运行:</b></br>
-在releases中下载最近release的压缩包,解压至本地即可运行并使用.
+在releases中下载最近release的压缩包,解压至本地即可运行并使用.</br></br></br></br>
+代码编译:</br>
+安装官方AutoHotKey,使用命令行编译globalkeys.ahk文件
 
