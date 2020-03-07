@@ -5,14 +5,11 @@
 global firstCtrl:=False
 global qMode:=False
 global qharr:=0
-;跳转到某个标签
-somewhere=%1%
-StringLen, len, somewhere
-; MsgBox % len
-if(len>0)
-{
- Goto, %somewhere%
-}
+
+;跳转到参数1代表的标签
+
+goto_somewhere(1)
+
 ; 开启快速输入模式
 Enable_qMode_forSomeTime(){
     SetValueForSomeTime(qMode,not qMode)

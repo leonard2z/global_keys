@@ -84,3 +84,15 @@ select_files_to_save(   Options, RootDir, Prompt, Filter*){
     return pathes
 
 }
+
+goto_somewhere(somewhere){
+    label:=%somewhere%
+    ;跳转到某个标签
+    len:=StrLen(label)
+    ; MsgBox % "len:"len " jump_to:" label
+    ; MsgBox % len
+    if(len>0)
+    {
+        Gosub,%label%
+    }
+}
