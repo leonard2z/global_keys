@@ -55,3 +55,32 @@ run_as_admin_quit(params=""){
     if(run_as_admin(params))
      ExitApp, 0
 }
+select_files_to_save(   Options, RootDir, Prompt, Filter*){
+    
+    FileSelectFile OutputVar, %Options%, %RootDir%, %Prompt%, %Filter%
+    MsgBox % OutputVar
+    OutputArray:=StrSplit(OutputVar,["`r`n","`n","`n`r"])
+
+    len:=OutputArray.Length()
+    MsgBox, %len%
+    pathes:=[]
+    if(len>0)
+    {
+        if("M" in Options)
+        {
+            MsgBox, "M" in Options
+            ;有多选
+            dir:=OutputArray[1]
+
+            for k,v in OutputArray{
+                if(k=1)
+                Continue
+                path:=dir "\" v
+                pathes.Push(path)
+                MsgBox,%path%
+            }
+        }
+    }
+    return pathes
+
+}

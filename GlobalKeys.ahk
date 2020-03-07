@@ -1,12 +1,13 @@
 ﻿#Include, lib/common.ahk
 #Include, lib/explorer.ahk
 #Include, lib/task_scheduler.ahk
+#Include, test.ahk
+
 global firstCtrl:=False
 global qMode:=False
 global qharr:=0
 ;跳转到某个标签
 somewhere=%1%
-
 StringLen, len, somewhere
 ; MsgBox % len
 if(len>0)
@@ -126,29 +127,31 @@ s::
     
     SAFT48kHz16BitStereo:= 39
     SSFMCreateForWrite := 3 ;;Creates file even if file exists and so destroys or overwrites the existing file
-        
+
     text:=get_selected_text()
-    
-    oFileStream := ComObjCreate("SAPI.SpFileStream")
-    oFileStream.Format.Type := SAFT48kHz16BitStereo
-        
-    FileSelectFile, path,S24,%A_DesktopCommon%\record.wav,,*.wav
-    try{
-        oFileStream.Open(path, SSFMCreateForWrite)
-        }
-    Catch, e{
-        MsgBox,未能打开文件,如果文件已存在请以管理员身份运行
-        return
-    }
     
     vi:=ComObjCreate("SAPI.SpVoice")
     v:=vi.GetVoices().Item(0) ;0:zh 1:en 2:ja 3:unkonwn
     vi.Voice:=v
     
-    
+    files:=select_files_to_save("MS24",A_DesktopCommon "\record.wav","","*.wav")  
+    for k,file in files{
+    ; FileSelectFile, path,S24,%A_DesktopCommon%\record.wav,,*.wav
+    try{
+        oFileStream := ComObjCreate("SAPI.SpFileStream")
+        oFileStream.Format.Type := SAFT48kHz16BitStereo
+        oFileStream.Open(file, SSFMCreateForWrite)
+        }
+    Catch, e{
+        MsgBox,未能打开文件,如果文件已存在请以管理员身份运行
+        return
+    }
     vi.AudioOutputStream := oFileStream
     vi.Speak(text)
     oFileStream.Close()
+    }
+   
+   
     ; ComObjCreate("System.Speech.Synthesis.SpeechSynthesizer").Speak(get_selected_text())
 return
 

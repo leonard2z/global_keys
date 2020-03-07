@@ -7,7 +7,6 @@ if(StrLen(par)>0)
   start(par)
 }
 
-
 start(path){
     try{
         run % path
