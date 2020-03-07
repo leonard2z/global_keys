@@ -134,6 +134,7 @@ s::
     vi.Voice:=v
     
     files:=select_files_to_save("MS24",A_Desktop "\record.wav","","*.wav")  
+
     for k,file in files{
     ; FileSelectFile, path,S24,%A_Desktop%\record.wav,,*.wav
     try{
@@ -169,7 +170,7 @@ $c::
         time:=StrReplace(OutNameNoExt, " " ,":")
         create_daily_clock_task(time,path)
     }
-    ;MsgBox, %info%
+    MsgBox, %info%
     info:=""
     return
     

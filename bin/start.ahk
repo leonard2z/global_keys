@@ -9,7 +9,13 @@ if(StrLen(par)>0)
 
 start(path){
     try{
-        run % path
+        ;
+        if(FileExist(path))
+            run % path
+            return 0
+        
+        return 1 ;failed to start the file
+        
     }Catch e{
         MsgBox % e.what e.message e.extra e.file e.line
     }
