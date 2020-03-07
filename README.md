@@ -18,4 +18,4 @@ c:将选中的文件按文件名添加到计划中</br></br></br></br>
 在releases中下载最近release的压缩包,解压至本地即可运行并使用.</br></br></br></br>
 代码编译:</br>
 安装官方AutoHotKey,使用命令行编译globalkeys.ahk文件
-
+<a href="http://music.163.com/song?id=26328713&userid=480586877">Circle Of Transmigration</a>
