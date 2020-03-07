@@ -1,6 +1,6 @@
 # global_keys
-Globalkeys全局热键快捷操作</br>
-基于AutoHotKey
+Globalkeys是一个基于AutoHotKey的全局热键操作小工具</br></br>
+<b>主要功能和操作方法:</b>
 按下两次Ctrl后再按</br></br>
 t:输入当前时间</br></br>
 z:口吐莲花</br></br>
