@@ -1,13 +1,13 @@
 ﻿#Include, lib/common.ahk
 #Include, lib/explorer.ahk
 #Include, lib/task_scheduler.ahk
+#Include, lib/config.ahk
 
 global firstCtrl:=False
 global qMode:=False
 global qharr:=0
 
 ;跳转到参数1代表的标签
-
 goto_somewhere(1)
 
 ; 开启快速输入模式
@@ -78,7 +78,8 @@ Return
     ;打开音乐并播放音乐(测试网易云)
 p::
     try{
-        run % GetFilePath("files/default.mp3")
+        start_with_config(GetFilePath("files/default.mp3"))
+        ; run % GetFilePath("files/default.mp3")
         Sleep,15000
         send {Media_Next,5}
     }Catch e{
@@ -87,7 +88,7 @@ p::
 return
 
 #if qMode
-    ;҉文҉字҉变҉花҉ aadd
+    ;҉文҉字҉变҉花҉ aaddn
 h::
     h:=get_selected_text()
     arr:=StrSplit(h,"")
@@ -147,8 +148,7 @@ s::
     vi.Speak(text)
     oFileStream.Close()
     }
-   
-   
+    
     ; ComObjCreate("System.Speech.Synthesis.SpeechSynthesizer").Speak(get_selected_text())
 return
 
@@ -167,6 +167,7 @@ $c::
         time:=StrReplace(OutNameNoExt, " " ,":")
         create_daily_clock_task(time,path)
     }
+
     MsgBox, %info%
     info:=""
     return

@@ -1,4 +1,5 @@
 #Include, lib/common.ahk
+#Include, lib/config.ahk
 global info:=""
 ;在windows的TaskScheduler中创建每日提醒,
 ;提醒时间从选择的文件名中取得,统一为MM SS
@@ -70,14 +71,21 @@ create_daily_clock_task(time,mpath,description=""){
     Action:= taskDefinition.Actions.Create( ActionTypeExec)
     SplitPath, mpath , OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
 
-    if ( ["mp1","mp2","mp3","mp4","wma","wmv","rm","rmvb","aac","mid","wav","vqf","avi","mpg","mpeg","cda"] Contains %OutExtension% )
-    {
-        ;对于音乐文件,指定播放器为wmp
-        Action.Path:="""" A_ProgramFiles "\Windows Media Player\wmplayer.exe" """"
-        
-    }else{
+    exe:=exe_to_ext[OutExtension]
+    MsgBox,exe=%exe%
+    ;如果在设置文件中该文件名后缀被指定了启动程序
+    if(strlen(exe)!=0)
+        Action.Path:="""" exe """"
+    Else
         Action.Path:="""" GetFilePath("bin\start.exe") """"
-    }
+    ; if ( ["mp1","mp2","mp3","mp4","wma","wmv","rm","rmvb","aac","mid","wav","vqf","avi","mpg","mpeg","cda"] Contains %OutExtension% )
+    ; {
+    ;     ;对于音乐文件,指定播放器为wmp
+    ;     Action.Path:="""" A_ProgramFiles "\Windows Media Player\wmplayer.exe" """"
+        
+    ; }else{
+    ;     Action.Path:="""" GetFilePath("bin\start.exe") """"
+    ; }
     Action.Arguments:="""" mpath """"
     ;Register (create) the task.
     rootFolder.RegisterTaskDefinition(name, taskDefinition, 6, , , 3)
