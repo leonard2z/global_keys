@@ -2,7 +2,7 @@
 
 global CFG_FILE_PATH:= GetFilePath("files\config.ini")
 global exe_to_ext:=get_config("exe_to_ext")
-MsgBox % "exe_to_ext[mp3]=" exe_to_ext["mp3"]
+;MsgBox % "exe_to_ext[mp3]=" exe_to_ext["mp3"]
 ; MsgBox % exe_to_ext["wmv"]
 get_config(section,key*){
     ; MsgBox, %CFG_FILE_PATH%
@@ -35,11 +35,11 @@ start_with_config(path)
 {
     SplitPath, path , OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
     exe:=exe_to_ext[OutExtension]
-    MsgBox ,exe=%exe%
+    ;MsgBox ,exe=%exe%
     if(strlen(exe)!=0)
     {
         ;如果在设置文件中该文件名后缀被指定了启动程序
-        MsgBox,%exe% %path%
+        ;MsgBox,%exe% %path%
         run,%exe% %path%
     }
     Else

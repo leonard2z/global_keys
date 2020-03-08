@@ -72,7 +72,7 @@ create_daily_clock_task(time,mpath,description=""){
     SplitPath, mpath , OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
 
     exe:=exe_to_ext[OutExtension]
-    MsgBox,exe=%exe%
+    ;MsgBox,exe=%exe%
     ;如果在设置文件中该文件名后缀被指定了启动程序
     if(strlen(exe)!=0)
         Action.Path:="""" exe """"
