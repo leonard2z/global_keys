@@ -6,6 +6,7 @@
 global firstCtrl:=False
 global qMode:=False
 global qharr:=0
+global main_config:=get_config("global")
 
 ;跳转到参数1代表的标签
 goto_somewhere(1)
@@ -31,8 +32,11 @@ return
 #if qMode
     ;当前日期时间
 t::
-    FormatTime, TimeString,R
-        Send,%TimeString%
+    f:=main_config["time_format"]
+    MsgBox,%f%
+    FormatTime, TimeString , ,%f%
+    ; FormatTime, TimeString,R
+    Send,%TimeString%
     Disable_qMode()
 return
 
@@ -110,9 +114,7 @@ r::
 vi:=ComObjCreate("SAPI.SpVoice")
 v:=vi.GetVoices().Item(0) ;0:zh 1:en 2:ja 3:unkonwn
 vi.Voice:=v
-
 vi.Speak(get_selected_text())
-
 return
 
 s::
@@ -148,7 +150,7 @@ s::
     vi.Speak(text)
     oFileStream.Close()
     }
-    
+
     ; ComObjCreate("System.Speech.Synthesis.SpeechSynthesizer").Speak(get_selected_text())
 return
 
@@ -163,13 +165,11 @@ $c::
     for k,path in sel{
         ; MsgBox, %path%
         SplitPath, path,OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
-        
-        time:=StrReplace(OutNameNoExt, " " ,":")
+        time:=RegExReplace(OutNameNoExt, "\s+", ":")
         create_daily_clock_task(time,path)
     }
-
     MsgBox, %info%
     info:=""
     return
-    
+
 return

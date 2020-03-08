@@ -44,9 +44,7 @@ start_with_config(path)
     }
     Else
     {
-         
             start(path)
-        
     }
 }
 

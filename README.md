@@ -16,7 +16,9 @@ s:将选中文字转化为语音文件后保存到本地</br></br>
 c:将选中的文件按文件名添加到计划中</br></br></br></br>
 <b>配置文件config.ini:</b></br>
 [exe_to_ext]</br>
-自定义每种格式文件的启动程序
+自定义每种格式文件的启动程序</br>
+[global]</br>
+time_format:自定义输出时间格式如 yyyy:MM:dd H:m:s</br></br>
 
 <b>下载和运行:</b></br>
 在releases中下载最近release的压缩包,解压至本地即可运行并使用.</br></br></br></br>

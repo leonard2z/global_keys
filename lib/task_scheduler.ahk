@@ -1,6 +1,7 @@
 #Include, lib/common.ahk
 #Include, lib/config.ahk
 global info:=""
+global config:=get_config("task_scheduler")
 ;在windows的TaskScheduler中创建每日提醒,
 ;提醒时间从选择的文件名中取得,统一为MM SS
 create_daily_clock_task(time,mpath,description=""){
@@ -10,7 +11,9 @@ create_daily_clock_task(time,mpath,description=""){
     ActionTypeExec = 0
 
     ;logon type https://docs.microsoft.com/en-us/windows/win32/taskschd/principal-logontype
-    TASK_LOGON_SERVICE_ACCOUNT=5
+    logontype:=config["logontype"]
+    ;  MsgBox, %logontype%
+    ; TASK_LOGON_SERVICE_ACCOUNT=5
     
     name:="ahk_" StrReplace(time, ":")
 
@@ -27,18 +30,23 @@ create_daily_clock_task(time,mpath,description=""){
     regInfo:= taskDefinition.RegistrationInfo
     regInfo.Description:= "automatically created by ahk"
     regInfo.Author:= "collen"
-    
+
     ;Set the Principal
     principal:=taskDefinition.Principal
     principal.RunLevel:=1 ;0:low 1:highest
-    principal.LogonType:=TASK_LOGON_SERVICE_ACCOUNT
+    principal.LogonType:=logontype
     
-    ; ;Set the task setting info for the Task Scheduler by
+    ;Set the task setting info for the Task Scheduler by
     settings:= taskDefinition.Settings
     settings.Enabled:= True
     settings.StartWhenAvailable:= True
     settings.Hidden:= False
     settings.WakeToRun:= True
+
+    ;idle setting
+    idleSetting:=settings.IdleSettings
+    ; IdleSettings.IdleDuration:="PT10M"
+    ; IdleSettings.WaitTimeout:="PT1H"
 
     ; ;Create a daily trigger. Note that the start boundary 
     triggers:= taskDefinition.Triggers
