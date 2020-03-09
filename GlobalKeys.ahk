@@ -33,7 +33,7 @@ return
     ;当前日期时间
 t::
     f:=main_config["time_format"]
-    MsgBox,%f%
+    ;MsgBox,%f%
     FormatTime, TimeString , ,%f%
     ; FormatTime, TimeString,R
     Send,%TimeString%
@@ -171,5 +171,5 @@ $c::
     MsgBox, %info%
     info:=""
     return
-
+    
 return
