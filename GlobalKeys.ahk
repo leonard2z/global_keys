@@ -189,17 +189,20 @@ $c::
     run_as_admin_quit("create_task")
     ;创建定时计划,时间由文件名决定
     ; FileSelectFile, pathes,MS24,%A_Desktop%\,,
-
-    sel:=StrSplit(Explorer_GetSelected(),["`r`n","`n","`n`r"])
+    sel:=split_to_lines(Explorer_GetSelected())
     ; MsgBox, %sel%
     for k,path in sel{
-        ; MsgBox, %path%
+        if(!FileExist(path))
+            Continue
+        MsgBox, %path%
         SplitPath, path,OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
         time:=RegExReplace(OutNameNoExt, "\s+", ":")
         create_daily_clock_task(time,path)
     }
-    MsgBox, %info%
+    MsgBox, 已添加的计划:`n%info%
     info:=""
+    ts=%A_WinDir%\system32\taskschd.msc
+    start(ts)
     return
     
 return

@@ -1,1 +1,0 @@
-tasklist | findstr /i "TIM.exe"  >> D:\Code\VSC\firstProgram\ahk\globalKeys\folder/temp.txt

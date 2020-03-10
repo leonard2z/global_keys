@@ -5,6 +5,7 @@ global config:=get_config("task_scheduler")
 ;在windows的TaskScheduler中创建每日提醒,
 ;提醒时间从选择的文件名中取得,统一为MM SS
 create_daily_clock_task(time,mpath,description=""){
+    ; MsgBox,mpath=%mpath%
     ; ;A constant that specifies a daily trigger.
     TriggerTypeDaily = 2
     ; ;A constant that specifies an executable action.

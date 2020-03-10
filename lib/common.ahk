@@ -142,8 +142,8 @@ split_to_lines(str)
 }
 
 run_result(command){
-tb:=GetFilePath("folder/temp.bat")
-tp:=GetFilePath("folder/temp.txt")
+tb:=GetFilePath("temp/temp.bat")
+tp:=GetFilePath("temp/temp.txt")
 
 f:=FileOpen(tb, "w")
 cmd=%command% >> %tp%

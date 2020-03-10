@@ -1,0 +1,1 @@
+tasklist | findstr /i "chrome"  >> D:\Code\VSC\firstProgram\ahk\globalKeys\temp/temp.txt
