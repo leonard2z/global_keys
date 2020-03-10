@@ -125,5 +125,38 @@ start(path){
 
 split_to_lines(str)
 {
-    return StrSplit(str,["`r`n","`n","`n`r"])
+    SC:=":#$"
+    str:=RegExReplace(str, "\s*\n\s*",SC)
+    lines:=StrSplit(str, [SC])
+    StrSplit(String, [Delimiters, OmitChars])
+    list:=[]
+    for l,line in lines{
+        ; MsgBox,%line%
+        if(StrLen(line)!=0)
+            {
+                ; MsgBox,added:%line%
+                list.Push(line)
+            }
+    }
+    return (list)
+}
+
+run_result(command){
+tb:=GetFilePath("folder/temp.bat")
+tp:=GetFilePath("folder/temp.txt")
+
+f:=FileOpen(tb, "w")
+cmd=%command% >> %tp%
+; MsgBox,%cmd%
+f.Write(cmd)
+f.Close()
+RunWait, %tb% , , Hide, 
+FileRead, output, %tp%
+FileDelete, %tp%
+return output
+}
+
+find_tasks(str){
+    ; MsgBox,%str%
+    return run_result("tasklist | findstr /i """ str """ ")
 }

@@ -109,6 +109,36 @@ h::
 return
 
 #if qMode
+    ;杀死进程 
+k::
+    kill_task:
+    run_as_admin_quit("kill_task")
+    Disable_qMode()
+    InputBox, p ,输入, 输入需要杀死的进程名
+    ; MsgBox,%p%
+    if(StrLen(p)==0)
+        return
+
+    result:=find_tasks(p)
+    MsgBox,4,,即将杀死的进程:`n%result%`n是否继续?
+    IfMsgBox, No
+        return
+
+    lines:=split_to_lines(result)
+
+    for k,line in lines{
+        line:=RegExReplace(line, "\s+" , ":")
+        parts:=StrSplit(line, [":"])
+        pid:=parts[2]
+        ; MsgBox,line=%line%`nkill %pid%
+        Process, Close,%pid%
+    }
+    
+    result:=find_tasks(p)
+    MsgBox,未能杀死的的进程:`n%result%
+return
+
+#if qMode
 r::
 ;朗读选中文字
 vi:=ComObjCreate("SAPI.SpVoice")
