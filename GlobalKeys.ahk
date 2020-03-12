@@ -2,6 +2,7 @@
 #Include, lib/explorer.ahk
 #Include, lib/task_scheduler.ahk
 #Include, lib/config.ahk
+#Include, lib/regex.ahk
 
 global firstCtrl:=False
 global qMode:=False
@@ -11,12 +12,15 @@ global main_config:=get_config("global")
 ;跳转到参数1代表的标签
 goto_somewhere(1)
 
+
 ; 开启快速输入模式
-Enable_qMode_forSomeTime(){
+Enable_qMode_forSomeTime()
+{
     SetValueForSomeTime(qMode,not qMode)
     }
 ; 关闭快速输入模式
-Disable_qMode(){
+Disable_qMode()
+{
     qMode:=False
 }
 
@@ -35,7 +39,7 @@ t::
     f:=main_config["time_format"]
     ;MsgBox,%f%
     FormatTime, TimeString , ,%f%
-    ; FormatTime, TimeString,R
+        ; FormatTime, TimeString,R
     Send,%TimeString%
     Disable_qMode()
 return
@@ -61,7 +65,8 @@ return
 #if qMode
 l::
 ;如果没有读取文件则读取文件
-if(qharr=0){
+if(qharr=0)
+{
     FileEncoding, utf-8
     fn:=GetFilePath("files\LoveTalk.txt")
     
@@ -71,7 +76,7 @@ if(qharr=0){
     qharr:=StrSplit(data, "<n>")
 }
 
-mi:=qharr.Length() 
+mi:=qharr.Length()
 Random,rand, 0 , mi
 res:=Trim(qharr[rand]," `t`r`n")
 
@@ -111,21 +116,21 @@ return
 #if qMode
     ;杀死进程 
 k::
-    kill_task:
+kill_task:
     run_as_admin_quit("kill_task")
     Disable_qMode()
     InputBox, p ,输入, 输入需要杀死的进程名
     ; MsgBox,%p%
     if(StrLen(p)==0)
         return
-
+    
     result:=find_tasks(p)
     MsgBox,4,,即将杀死的进程:`n%result%`n是否继续?
     IfMsgBox, No
         return
-
+    
     lines:=split_to_lines(result)
-
+    
     for k,line in lines{
         line:=RegExReplace(line, "\s+" , ":")
         parts:=StrSplit(line, [":"])
@@ -156,7 +161,7 @@ s::
     
     SAFT48kHz16BitStereo:= 39
     SSFMCreateForWrite := 3 ;;Creates file even if file exists and so destroys or overwrites the existing file
-
+        
     text:=get_selected_text()
     
     vi:=ComObjCreate("SAPI.SpVoice")
@@ -164,28 +169,28 @@ s::
     vi.Voice:=v
     
     files:=select_files_to_save("MS24",A_Desktop "\record.wav","","*.wav")  
-
+    
     for k,file in files{
-    ; FileSelectFile, path,S24,%A_Desktop%\record.wav,,*.wav
-    try{
-        oFileStream := ComObjCreate("SAPI.SpFileStream")
-        oFileStream.Format.Type := SAFT48kHz16BitStereo
-        oFileStream.Open(file, SSFMCreateForWrite)
+        ; FileSelectFile, path,S24,%A_Desktop%\record.wav,,*.wav
+        try{
+            oFileStream := ComObjCreate("SAPI.SpFileStream")
+            oFileStream.Format.Type := SAFT48kHz16BitStereo
+                oFileStream.Open(file, SSFMCreateForWrite)
+            }
+        Catch, e{
+            MsgBox,未能打开文件,如果文件已存在请以管理员身份运行
+            return
         }
-    Catch, e{
-        MsgBox,未能打开文件,如果文件已存在请以管理员身份运行
-        return
+        vi.AudioOutputStream := oFileStream
+        vi.Speak(text)
+        oFileStream.Close()
     }
-    vi.AudioOutputStream := oFileStream
-    vi.Speak(text)
-    oFileStream.Close()
-    }
-
+    
     ; ComObjCreate("System.Speech.Synthesis.SpeechSynthesizer").Speak(get_selected_text())
 return
 
 $c::
-    create_task:
+create_task:
     run_as_admin_quit("create_task")
     ;创建定时计划,时间由文件名决定
     ; FileSelectFile, pathes,MS24,%A_Desktop%\,,
@@ -203,6 +208,45 @@ $c::
     info:=""
     ts=%A_WinDir%\system32\taskschd.msc
     start(ts)
-    return
+return
+
+o::
+    debug:
+    ; FileAssociate()
+    ; 从选中字符串提取链接并创建多个链接的单一快捷方式
+    txt:=get_selected_text()
+    lines:=split_to_lines(txt)
+    program:=main_config["browser_location"]
+    ; link:="""" main_config["browser_location"] """"
     
+    ctt:=""
+    ;创建bat
+    for k,line in lines{
+        ctt:=ctt "start" " """" """ line """`n"
+    }
+
+     MsgBox,创建脚本:`n%ctt%
+    ; f=GetFilePath("temp/temp")
+    f:=select_files_to_save("MS24",A_Desktop "\link.bat","","*.lnk")  
+    ; MsgBox,file:`n%f%
+    if(f.Length()==0)
+    return
+    fo:=FileOpen(f[1], "w")
+    fo.Write(ctt)
+    fo.Close()
+    
+    ; www.hello.com
+    ; www.hello.com
+    ;创建快捷方式
+    ; args:=""
+    ; for k,line in lines{
+    ;     args:=args " """ line """"
+    ; }
+    ; ; hello.com
+    ; FileSelectFile, pa , S24, A_Desktop\link.lnk, "", *.lnk
+    ; ; pa:=select_files_to_save("MS24",A_Desktop "\link.lnk","","*.lnk")  
+    ; MsgBox,path=`n%pa% `nlink:`n%args% 
+    
+    ; FileCreateShortcut, %program% , %pa% , ,%args% , Iink created by ahk, , , 
+return
 return

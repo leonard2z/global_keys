@@ -6,7 +6,8 @@ if(StrLen(par)>0)
   start(par)
 }
 
-start(path){
+start(path)
+{
     try{
         
         if(FileExist(path))

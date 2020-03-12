@@ -4,7 +4,8 @@ global CFG_FILE_PATH:= GetFilePath("files\config.ini")
 global exe_to_ext:=get_config("exe_to_ext")
 ;MsgBox % "exe_to_ext[mp3]=" exe_to_ext["mp3"]
 ; MsgBox % exe_to_ext["wmv"]
-get_config(section,key*){
+get_config(section,key*)
+{
     ; MsgBox, %CFG_FILE_PATH%
     IniRead, OutputVar, %CFG_FILE_PATH%, %section%, %key%
 
@@ -25,10 +26,12 @@ get_config(section,key*){
     }
     return OutputVar
 }
-set_config(section,key,Value*){
+set_config(section,key,Value*)
+{
     IniWrite, Value, %CFG_FILE_PATH%, %Section%, %Key%
 }
-delete_config(section,key*){
+delete_config(section,key*)
+{
     IniDelete, %CFG_FILE_PATH%, %Section%,%key%
 }
 start_with_config(path)

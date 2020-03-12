@@ -4,7 +4,8 @@ global info:=""
 global config:=get_config("task_scheduler")
 ;在windows的TaskScheduler中创建每日提醒,
 ;提醒时间从选择的文件名中取得,统一为MM SS
-create_daily_clock_task(time,mpath,description=""){
+create_daily_clock_task(time,mpath,description="")
+{
     ; MsgBox,mpath=%mpath%
     ; ;A constant that specifies a daily trigger.
     TriggerTypeDaily = 2
@@ -75,7 +76,8 @@ create_daily_clock_task(time,mpath,description=""){
     ;Add an action to the task to run notepad.exe.
     ;press a key a wake up the screen
     Action:= taskDefinition.Actions.Create( ActionTypeExec)
-    Action.Path:="""" GetFilePath("bin\sendKey.exe") """"
+    Action.Path:="""" GetFilePath("bin\cmd.exe") """"
+    Action.Arguments:="send_key"
 
     Action:= taskDefinition.Actions.Create( ActionTypeExec)
     SplitPath, mpath , OutFileName, OutDir, OutExtension, OutNameNoExt, OutDrive
@@ -84,9 +86,16 @@ create_daily_clock_task(time,mpath,description=""){
     ;MsgBox,exe=%exe%
     ;如果在设置文件中该文件名后缀被指定了启动程序
     if(strlen(exe)!=0)
-        Action.Path:="""" exe """"
+        {
+            Action.Path:="""" exe """"
+            Action.Arguments:="""" mpath """"
+        }
     Else
-        Action.Path:="""" GetFilePath("bin\start.exe") """"
+        {
+            Action.Path:="""" GetFilePath("bin\cmd.exe") """"
+            Action.Arguments:="start " """" mpath """"
+        }
+
     ; if ( ["mp1","mp2","mp3","mp4","wma","wmv","rm","rmvb","aac","mid","wav","vqf","avi","mpg","mpeg","cda"] Contains %OutExtension% )
     ; {
     ;     ;对于音乐文件,指定播放器为wmp
@@ -95,7 +104,7 @@ create_daily_clock_task(time,mpath,description=""){
     ; }else{
     ;     Action.Path:="""" GetFilePath("bin\start.exe") """"
     ; }
-    Action.Arguments:="""" mpath """"
+   
     ;Register (create) the task.
     rootFolder.RegisterTaskDefinition(name, taskDefinition, 6, , , 3)
 
