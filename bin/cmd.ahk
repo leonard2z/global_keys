@@ -1,4 +1,3 @@
-#Include, ./
 #Include, ../lib/common.ahk
 
 

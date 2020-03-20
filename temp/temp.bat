@@ -1,1 +1,1 @@
-tasklist | findstr /i "chrome"  >> D:\Code\VSC\firstProgram\ahk\globalKeys\temp/temp.txt
+wmic process where "ExecutablePath is not null"  get name,ProcessID,ExecutablePath | findstr /v Windows >> D:\Code\VSC\firstProgram\ahk\globalKeys\temp/temp.txt

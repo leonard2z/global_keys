@@ -131,7 +131,7 @@ split_to_lines(str)
         ; MsgBox,%line%
         if(StrLen(line)!=0)
         {
-            ; MsgBox,added:%line%
+            
             list.Push(line)
         }
     }
@@ -140,6 +140,9 @@ split_to_lines(str)
 
 run_result(command)
 {
+
+    ; ScrollBox(command)
+    ; MsgBox,%command%
     tb:=GetFilePath("temp/temp.bat")
     tp:=GetFilePath("temp/temp.txt")
     
@@ -151,76 +154,128 @@ run_result(command)
     RunWait, %tb% , , Hide, 
     FileRead, output, %tp%
     FileDelete, %tp%
+    ; MsgBox,%output%
     return output
 }
 
-;根据名称找到进程
+split_to_words(str){
+    sign:="`n"
+    line:=RegExReplace(str, "\s+" , sign)
+   
+    parts:=StrSplit(line, [sign])
+    return parts
+}
+
+;根据名称找到非系统进程
 find_tasks(str)
 {
-    ; MsgBox,%str%
-    return run_result("tasklist | findstr /i """ str """ ")
+        ; MsgBox,%str%
+    cmd=wmic process where "ExecutablePath is not null"  get name,ProcessID,ExecutablePath | findstr /v Windows 
+
+    tasks:=[]
+    ;  MsgBox, cmd:%cmd%
+    if(StrLen(str)!=0)
+        res:= run_result(cmd " | findstr /i """ str """ ")
+    else
+        res:=  run_result(cmd)
+
+    lines:=split_to_lines(res)
+    
+    ; ScrollBox("res:" res "`n" print_table(lines))
+    ;MsgBox, %res%
+    if(StrLen(str)==0)
+    {
+        lines.Remove(1)
+    }
+    
+    for k,line in split_to_lines(res){
+        ; MsgBox, line=%line%
+        pid:=SubStr(line,RegExMatch(line, "\d+(?=\s*)$" ))
+        ; MsgBox, pid=%pid%
+        line:=RegExReplace(line,"\s*\d+\s*$")
+        ; RegExMatch(RegExReplace(line,"\s*\d+$"),"\w+$")
+        ;  MsgBox, line=%line%
+        line:=SubStr(line, RegExMatch(line,"\S+$"))
+        ; line:=
+        ;  MsgBox, line=%line%
+        ; words:=split_to_words(line)
+        
+        tasks.Push([line,pid])
+    }
+    obj:=print_table(tasks)
+    ;MsgBox, tasks=`n%obj%
+
+    return tasks
 }
 
-FileAssociate(Label,Ext,Cmd,Icon:="", batchMode:=0) {
-; by Ħakito: https://autohotkey.com/boards/viewtopic.php?f=6&t=55638 
-; modified by Marius Șucan to AHK v1.1
-
-; Weeds out faulty extensions, which must start with a period, and contain more than 1 character
-iF (SubStr(Ext,1,1)!="." || StrLen(Ext)<=1)
-    Return 0
-
-; Weeds out faulty labels such as ".exe" which is an extension and not a label
-iF (SubStr(Label,1,1)=".")
-    Return 0
-
-If Label
-    RegRead, CheckLabel, HKEY_CLASSES_ROOT\%Label%, FriendlyTypeName
-
-; Do not allow the modification of some important registry labels
-iF (Cmd!="" && CheckLabel)
-    Return 0
-
-regFile := "Windows Registry Editor Version 5.00`n`n"
-; Note that "HKEY_CLASSES_ROOT" actually writes to "HKEY_LOCAL_MACHINE\SOFTWARE\Classes"
-; If the command is just a simple path, then convert it into a proper run command
-iF (SubStr(Cmd,2,2)=":\" && FileExist(Cmd))
-    Cmd := """" Cmd """" A_Space """" "%1" """"
-Else
-    Return 0
-
-Cmd := StrReplace(Cmd, "\", "\\")
-Cmd := StrReplace(Cmd, """", "\""")
-regFile .= "[HKEY_CLASSES_ROOT\" Ext "]`n@=" """" Label """" "`n"
-regFile .= "`n[HKEY_CLASSES_ROOT\" Label "]`n@=" """" Label """" "`n"
-regFile .= "`n[HKEY_CLASSES_ROOT\" Label "\Shell\Open\Command]`n@=" """" Cmd """" "`n"
-regFile .= "`n[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" Ext "\UserChoice]`n""ProgId""=" """" Label """" "`n"
-regFile .= "`n[-HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" Ext "\OpenWithProgids]`n"
-regFile .= "`n[-HKEY_CLASSES_ROOT\" Ext "\OpenWithProgids]`n`n"
-
-If Icon
-    regFile .= "`n[HKEY_CLASSES_ROOT\" QPVslideshow "\DefaultIcon]`n@=" Icon "`n`n"
-
-If !InStr(FileExist(mainCompiledPath "\regFiles"), "D")
+print_arr(arr,len:=10)
 {
-    FileCreateDir, %mainCompiledPath%\regFiles
-    Sleep, 1
+    str:=""
+    for k,v in arr{
+        str:=str Format("{1:-" len "}",v)
+    }
+    str:=str "`n"
+    return str
 }
-
-iExt := StrReplace(Ext, ".")
-FileDelete, %mainCompiledPath%\regFiles\RegFormat%iExt%.reg
-    Sleep, 1
-FileAppend, % regFile, %mainCompiledPath%\regFiles\RegFormat%iExt%.reg
-    runTarget := "Reg Import """ mainCompiledPath "\regFiles\RegFormat" iExt ".reg" """" "`n"
-If !InStr("|WIN_7|WIN_8|WIN_8.1|WIN_VISTA|WIN_2003|WIN_XP|WIN_2000|", "|" A_OSVersion "|")
-    runTarget .= """" mainCompiledPath "\SetUserFTA.exe""" A_Space Ext A_Space Label "`n"
-FileAppend, % runTarget, %mainCompiledPath%\regFiles\runThis.bat
-If (batchMode!=1)
+get_maxlen(arr)
 {
-    Sleep, 1
-    RunWait, *RunAs %mainCompiledPath%\regFiles\runThis.bat
-    FileDelete, %mainCompiledPath%\regFiles\RegFormat%iExt%.reg
-        FileDelete, %mainCompiledPath%\regFiles\runThis.bat
+    max:=0
+    for k,v in arr{
+        if(StrLen(v)>max)
+        max:=StrLen(v)
+    }
+    return max
+}
+get_table_maxlen(table)
+{
+    max:=0
+    for k,v in table{
+        m:=get_maxlen(v)
+        if(m>max)
+        max:=m
+    }
+    return max
+}
+print_table(table)
+{
+    str:=""
+    len:=get_table_maxlen(table)*2
+    ;MsgBox,len=%len%
+    for k,row in table{
+        str:=str print_arr(row,len)
+    }
+    str:=str "`n"
+    return str
 }
 
-return 1
+remove_whitelist(tasks)
+{
+    ;MsgBox,enter
+    keys_to_delete:=[]
+    lines_to_delete:=[]
+    ;  ret:=[]
+    path:=GetFilePath("files\ignored.txt")
+    Loop, read, %path%
+    {
+        ;MsgBox key process %A_LoopReadLine%
+        for k,line in tasks{
+            v:=line[1]
+            ; MsgBox, v= %v%
+            if(InStr(v,A_LoopReadLine))
+            {
+                keys_to_delete.Push(k)
+                lines_to_delete.Push(line)
+                ; lines_to_delete.Push(k)
+            }
+        }
+    }
+
+    ret:=print_table(lines_to_delete)
+
+    for k,key in keys_to_delete{
+        tasks.Delete(key)
+    }
+    
+    return ret
+    
 }

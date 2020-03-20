@@ -1,30 +1,38 @@
-﻿#Include, lib/common.ahk
+﻿#Include, lib/scrollbar.ahk
+#Include, lib/common.ahk
 #Include, lib/explorer.ahk
 #Include, lib/task_scheduler.ahk
 #Include, lib/config.ahk
 #Include, lib/regex.ahk
 
+
 global firstCtrl:=False
 global qMode:=False
 global qharr:=0
 global main_config:=get_config("global")
+goto_somewhere("debug")
 
-;跳转到参数1代表的标签
-goto_somewhere(1)
+; run_as_admin_quit("start")
+program_start:
+    ;跳转到参数1代表的标签
+    goto_somewhere(1)
+    ;尝试跳转到debug
+    ; goto_somewhere("debug")
 
-
-; 开启快速输入模式
-Enable_qMode_forSomeTime()
-{
-    SetValueForSomeTime(qMode,not qMode)
+    ; 开启快速输入模式
+    Enable_qMode_forSomeTime()
+    {
+        SetValueForSomeTime(qMode,not qMode)
+        }
+    ; 关闭快速输入模式
+    Disable_qMode()
+    {
+        qMode:=False
     }
-; 关闭快速输入模式
-Disable_qMode()
-{
-    qMode:=False
-}
-
-;双击开启qMode,一秒后关闭
+    ; paht:=Log(A_ScriptFullPath)
+    ; MsgBox, The current script is %A_ScriptName%
+    
+    ;双击开启qMode,一秒后关闭
 ~Ctrl::
     if (A_PriorHotKey = "~Ctrl" AND A_TimeSincePriorHotkey < 400)
     {
@@ -32,16 +40,16 @@ Disable_qMode()
         }
 return
 
+; Hotkey, KeyName [, Label, Options]
 ;当快速模式打开时的快捷操作
 #if qMode
     ;当前日期时间
-t::
-    f:=main_config["time_format"]
-    ;MsgBox,%f%
-    FormatTime, TimeString , ,%f%
-        ; FormatTime, TimeString,R
-    Send,%TimeString%
-    Disable_qMode()
+f:=main_config["time_format"]
+;MsgBox,%f%
+FormatTime, TimeString , ,%f%
+    ; FormatTime, TimeString,R
+Send,%TimeString%
+Disable_qMode()
 return
 
 ;退出程序
@@ -50,9 +58,13 @@ Esc::
 ExitApp, 0
 return
 
-#if qMode
-    ;口吐莲花
-z::
+q::
+     run "C:\Program Files\AutoHotkey\AutoHotkey.exe" "D:\Code\VSC\firstProgram\ahk\globalKeys\GlobalKeys.ahk" debug
+    ExitApp, 0
+return
+
+#if qMode口吐莲花
+    z::
     whr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     url=https://nmsl.shadiao.app/api.php?level=min&lang=zh_cn
     whr.Open("GET", url, true)
@@ -114,34 +126,73 @@ h::
 return
 
 #if qMode
-    ;杀死进程 
+    ;杀死进程 ,输入*杀死所有关键进程外的进程
 k::
+
 kill_task:
+    debug:
     run_as_admin_quit("kill_task")
     Disable_qMode()
-    InputBox, p ,输入, 输入需要杀死的进程名
-    ; MsgBox,%p%
+    InputBox, p ,输入, 输入需要杀死的进程名(输入*号代表杀死所有非关键进程)
     if(StrLen(p)==0)
         return
+
+    search:=p
+    if(p=="*")
+        {
+            search:=""
+            ;MsgBox,iiiii
+        }
+
+    lines:=find_tasks(search)
+    ; MsgBox % lines.Length()
+    if(lines.Length()==0)
+    {
+        result:="没有需要杀死的的进程,本窗口会自动关闭:`n"
+        ScrollBox(result ,"p2222")
+    return
+    }
+
+    ; ScrollBox(print_table(lines),"P")
+    ; lines:=split_to_lines(result)
+    ; result:=""t
+    if(p=="*")
+    removed:=remove_whitelist(lines)
+
+    result:=""
+    result:=result "请确认无误后继续?`n`n即将杀死的进程:`n"
+    result:=result print_table(lines)
+    ; for k,line in result{
+    ;     result:=result k ":" line "`n"
+    ; }
     
-    result:=find_tasks(p)
-    MsgBox,4,,即将杀死的进程:`n%result%`n是否继续?
-    IfMsgBox, No
-        return
-    
-    lines:=split_to_lines(result)
-    
+    result:=result "`n`n被忽略的进程:`n" removed
+
+
+    ret:=ScrollBox(result "","P b2")
+    if(!ret)
+        {
+            return
+        }
+
     for k,line in lines{
-        line:=RegExReplace(line, "\s+" , ":")
-        parts:=StrSplit(line, [":"])
-        pid:=parts[2]
-        ; MsgBox,line=%line%`nkill %pid%
+
+        pid:=line[2]
+        ; MsgBox,pid:%pid%
+        RunWait, taskkill /f /t /pid %pid%,,Hide
         Process, Close,%pid%
     }
     
-    result:=find_tasks(p)
-    MsgBox,未能杀死的的进程:`n%result%
+    lines:=find_tasks(search)
+    if(p=="*")
+    remove_whitelist(lines)
+    result:="未能杀死的的进程,本窗口会自动关闭:`n"
+    result:=result print_table(lines)
+    
+    ScrollBox(result ,"p2222")
 return
+
+ 
 
 #if qMode
 r::
@@ -173,6 +224,7 @@ s::
     for k,file in files{
         ; FileSelectFile, path,S24,%A_Desktop%\record.wav,,*.wav
         try{
+            
             oFileStream := ComObjCreate("SAPI.SpFileStream")
             oFileStream.Format.Type := SAFT48kHz16BitStereo
                 oFileStream.Open(file, SSFMCreateForWrite)
@@ -211,7 +263,7 @@ create_task:
 return
 
 o::
-    debug:
+    ; debug:
     ; FileAssociate()
     ; 从选中字符串提取链接并创建多个链接的单一快捷方式
     txt:=get_selected_text()
@@ -224,29 +276,16 @@ o::
     for k,line in lines{
         ctt:=ctt "start" " """" """ line """`n"
     }
-
-     MsgBox,创建脚本:`n%ctt%
+    
+    MsgBox,创建脚本:`n%ctt%
     ; f=GetFilePath("temp/temp")
     f:=select_files_to_save("MS24",A_Desktop "\link.bat","","*.lnk")  
     ; MsgBox,file:`n%f%
     if(f.Length()==0)
-    return
+        return
     fo:=FileOpen(f[1], "w")
     fo.Write(ctt)
     fo.Close()
     
-    ; www.hello.com
-    ; www.hello.com
-    ;创建快捷方式
-    ; args:=""
-    ; for k,line in lines{
-    ;     args:=args " """ line """"
-    ; }
-    ; ; hello.com
-    ; FileSelectFile, pa , S24, A_Desktop\link.lnk, "", *.lnk
-    ; ; pa:=select_files_to_save("MS24",A_Desktop "\link.lnk","","*.lnk")  
-    ; MsgBox,path=`n%pa% `nlink:`n%args% 
-    
-    ; FileCreateShortcut, %program% , %pa% , ,%args% , Iink created by ahk, , , 
 return
 return
